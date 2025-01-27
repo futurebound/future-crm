@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import axios from 'axios'
-import './App.css'
 
 function App() {
   const fetchAPI = async () => {
@@ -15,7 +14,7 @@ function App() {
 
   return (
     <>
-      <h1>FutureCRM</h1>
+      <h1 className='text-3xl text-red-500'>FutureCRM</h1>
     </>
   )
 }
