@@ -5,19 +5,16 @@ const express = require('express')
 const app = express()
 
 const cors = require('cors')
-// const allowedOrigins = ['https://localhost:5137']
-const allowedOrigins = ['https://future-crm-client.vercel.app']
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    },
-    credentials: true, // Allow cookies and credentials (if needed)
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://future-crm.vercel.app',
+      /\.vercel\.app$/, // Allow all Vercel subdomains during development
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
   }),
 )
 
