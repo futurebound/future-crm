@@ -1,10 +1,13 @@
-import { useEffect } from 'react'
 import axios from 'axios'
+import { useEffect } from 'react'
+import { Outlet } from 'react-router-dom'
+
+import NavBar from './components/NavBar'
 
 function App() {
   const fetchAPI = async () => {
-    // const response = await axios.get('http://localhost:8080/api')
-    const response = await axios.get('https://future-crm-server.vercel.app/')
+    const response = await axios.get('http://localhost:8080/api/v1')
+    // const response = await axios.get('https://future-crm-server.vercel.app/')
     console.log(response.data.message)
   }
 
@@ -15,7 +18,10 @@ function App() {
 
   return (
     <>
-      <h1 className='text-red-800'>FutureCRM</h1>
+      <NavBar />
+      <main className='flex-grow'>
+        <Outlet />
+      </main>
     </>
   )
 }
