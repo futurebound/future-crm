@@ -8,6 +8,7 @@
     "dev": "node --watch ./src/server.js",
     "generate": "pnpm dlx prisma generate",
     "migrate": "prisma migrate dev",
+    "postinstall": "prisma generate",
     "start": "node ./src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
