@@ -1,4 +1,5 @@
 import App from './App'
+import DashboardPage from './pages/DashboardPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -19,6 +20,10 @@ const routes = [
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/dashboard',
+        element: <DashboardPage />,
       },
     ],
   },

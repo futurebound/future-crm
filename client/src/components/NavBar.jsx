@@ -11,10 +11,13 @@ export default function NavBar() {
       {/* Nav Links */}
       <ul className='flex'>
         <li className='p-4'>
-          <Link to='/'>Home</Link>
+          <Link to='/dashboard'>Dashboard</Link>
         </li>
         <li className='p-4'>
-          <Link to='/signup'>Signup</Link>
+          <Link to='/signup'>Sign Up</Link>
+        </li>
+        <li className='p-4'>
+          <Link to='/login'>Log In</Link>
         </li>
       </ul>
     </nav>
