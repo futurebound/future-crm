@@ -10,7 +10,7 @@ app.use(
     origin: [
       'http://localhost:3000',
       'http://localhost:5173',
-      'https://future-crm.vercel.app',
+      'https://future-crm-client.vercel.app',
       /\.vercel\.app$/, // Allow all Vercel subdomains during development
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

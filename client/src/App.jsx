@@ -4,9 +4,7 @@ import axios from 'axios'
 function App() {
   const fetchAPI = async () => {
     // const response = await axios.get('http://localhost:8080/api')
-    const response = await axios.get(
-      'https://future-crm-server-ljps7kemw-futurebounds-projects.vercel.app/api'
-    )
+    const response = await axios.get('https://future-crm-server.vercel.app/')
     console.log(response.data.message)
   }
 
