@@ -6,7 +6,7 @@ const app = express()
 
 const cors = require('cors')
 const corsOptions = {
-  origin: ['http://localhost:5173'], // TODO: update to .env variable
+  origin: ['http://localhost:5173', process.env.CLIENT_URL], // TODO: update to .env variable
 }
 
 app.use(cors(corsOptions))
