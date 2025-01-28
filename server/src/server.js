@@ -5,12 +5,20 @@ const express = require('express')
 const app = express()
 
 const cors = require('cors')
-const corsOptions = {
-  // origin: ['http://localhost:5173'], // TODO: update to .env variable
-  origin: ['https://future-crm-client.vercel.app/'], // TODO: update to .env variable
-}
+const allowedOrigins = ['https://future-crm-client.vercel.app']
 
-app.use(cors(corsOptions))
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true, // Allow cookies and credentials (if needed)
+  }),
+)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
