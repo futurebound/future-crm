@@ -1,10 +1,11 @@
-const dotenv = require('dotenv')
-dotenv.config()
-
 const express = require('express')
 const app = express()
-
 const cors = require('cors')
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 app.use(
   cors({
     origin: [
@@ -24,7 +25,7 @@ app.use(express.urlencoded({ extended: true }))
  *  ---------------- ROUTES ---------------
  */
 app.get('/', (req, res) => {
-  res.json({ message: 'get /' })
+  res.json({ message: 'get /', env: process.env.NODE_ENV })
 })
 
 app.get('/api', (req, res) => {
@@ -34,9 +35,11 @@ app.get('/api', (req, res) => {
 /**
  *  ---------------- SERVER ---------------
  */
-// const PORT = process.env.PORT || 3000
-// app.listen(PORT, () => {
-//   console.log(`Listening on port ${PORT}!`)
-// })
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000
+  app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}!`)
+  })
+}
 
 module.exports = app
