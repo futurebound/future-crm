@@ -5,6 +5,7 @@ const express = require('express')
 const app = express()
 
 const cors = require('cors')
+// const allowedOrigins = ['https://localhost:5137']
 const allowedOrigins = ['https://future-crm-client.vercel.app']
 
 app.use(
@@ -37,7 +38,9 @@ app.get('/api', (req, res) => {
 /**
  *  ---------------- SERVER ---------------
  */
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}!`)
-})
+// const PORT = process.env.PORT || 3000
+// app.listen(PORT, () => {
+//   console.log(`Listening on port ${PORT}!`)
+// })
+
+module.exports = app
