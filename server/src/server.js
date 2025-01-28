@@ -26,6 +26,10 @@ app.use(express.urlencoded({ extended: true }))
 /**
  *  ---------------- ROUTES ---------------
  */
+app.get('/', (req, res) => {
+  res.json({ message: 'get /' })
+})
+
 app.get('/api', (req, res) => {
   res.json({ message: 'get /api/' })
 })
