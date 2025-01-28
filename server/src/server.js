@@ -1,5 +1,5 @@
 const express = require('express')
-const helmet = require('helmet')
+// const helmet = require('helmet')
 const app = express()
 const cors = require('cors')
 const api = require('./api/index')
@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-app.use(helmet())
+// app.use(helmet())
 app.use(
   cors({
     origin: [
