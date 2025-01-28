@@ -14,7 +14,6 @@ app.use(
       /\.vercel\.app$/, // Allow all Vercel subdomains during development
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
   }),
 )
 
