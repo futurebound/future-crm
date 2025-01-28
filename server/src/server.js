@@ -1,11 +1,14 @@
 const express = require('express')
+const helmet = require('helmet')
 const app = express()
 const cors = require('cors')
+const api = require('./api/index')
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
+app.use(helmet())
 app.use(
   cors({
     origin: [
@@ -28,9 +31,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'get /', env: process.env.NODE_ENV })
 })
 
-app.get('/api', (req, res) => {
-  res.json({ message: 'get /api/' })
-})
+app.use('/api/v1', api)
 
 /**
  *  ---------------- SERVER ---------------
