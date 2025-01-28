@@ -6,7 +6,8 @@ import NavBar from './components/NavBar'
 
 function App() {
   const fetchAPI = async () => {
-    const response = await axios.get('http://localhost:8080/api/v1')
+    const apiUrl = import.meta.env.VITE_API_URL
+    const response = await axios.get(apiUrl)
     // const response = await axios.get('https://future-crm-server.vercel.app/')
     console.log(response.data.message)
   }
