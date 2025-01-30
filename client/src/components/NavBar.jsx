@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom'
 
-export default function NavBar() {
+import { UserAuth } from '@/context/AuthContext'
+
+export default function NavBar({ session }) {
+  const { signOut } = UserAuth()
+
   return (
     <nav className='flex h-24 items-center justify-between bg-slate-500 px-4 text-white'>
       {/* Home Logo */}
@@ -17,7 +21,11 @@ export default function NavBar() {
           <Link to='/signup'>Sign Up</Link>
         </li>
         <li className='p-4'>
-          <Link to='/login'>Log In</Link>
+          {session ? (
+            <button onClick={signOut}>Sign Out</button>
+          ) : (
+            <Link to='/login'>Login</Link>
+          )}
         </li>
       </ul>
     </nav>

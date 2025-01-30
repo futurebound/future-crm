@@ -4,11 +4,14 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
 import './index.css'
 import routes from './routes'
+import { AuthContextProvider } from '@/context/AuthContext'
 
 const router = createBrowserRouter(routes)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
   </StrictMode>
 )

@@ -1,12 +1,13 @@
-import axios from 'axios'
+// import axios from 'axios'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+import { UserAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 
 export default function SignupPage() {
@@ -18,6 +19,13 @@ export default function SignupPage() {
   })
   const [loading, setLoading] = useState(false)
 
+  const { session, signUpNewUser } = UserAuth()
+  console.log(session)
+
+  /**
+   * Update form fields
+   * TODO: crazy re-rendering on input change, fix later
+   */
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -26,15 +34,21 @@ export default function SignupPage() {
     }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL
-      const response = await axios.post(`${apiUrl}/auth/signup`, formData)
-      console.log('signup successful', response.data)
-      navigate('/login')
+      console.log('Sign-up payload:', formData)
+      const result = await signUpNewUser(formData.email, formData.password)
+      console.log('result:', result)
+      if (result.success) {
+        toast({
+          title: 'Success',
+          description: 'You can now login',
+        })
+        navigate('/login')
+      }
     } catch (err) {
       toast({
         variant: 'destructive',
@@ -54,7 +68,13 @@ export default function SignupPage() {
           <CardTitle>Sign Up</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          Already have an account?{' '}
+          <Link to='/login' className='text-blue-500 underline'>
+            Log in!
+          </Link>
+        </CardContent>
+        <CardContent>
+          <form onSubmit={handleSignUp} className='space-y-4'>
             <div className='space-y-2'>
               <Label htmlFor='email'>Email</Label>
               <Input
