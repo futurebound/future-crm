@@ -20,7 +20,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
 
   const { session, signUpNewUser } = UserAuth()
-  console.log(session)
 
   /**
    * Update form fields

@@ -6,8 +6,6 @@ export default function DashboardPage() {
   const { session, signOutUser } = UserAuth()
   const navigate = useNavigate()
 
-  console.log(session)
-
   const handleSignOut = async (e) => {
     e.preventDefault()
     try {

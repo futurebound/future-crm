@@ -33,6 +33,20 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1', api)
 
+app.get('/api/v1/user/profile', async (req, res) => {
+  const authId = req.user?.id
+  if (!authId) return res.status(401).json({ error: 'Unauthorized' })
+
+  const user = await prisma.user.findUnique({
+    where: { authId },
+    select: { id: true, email: true, role: true }, // Add other fields as needed
+  })
+
+  if (!user) return res.status(404).json({ error: 'User not found' })
+
+  res.json(user)
+})
+
 /**
  *  ---------------- SERVER ---------------
  */

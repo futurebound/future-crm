@@ -23,3 +23,15 @@ Then run the following commands to
 pnpm migrate
 pnpm dlx prisma db push
 ```
+
+For Prisma on Supabase, be aware that `prisma generate` must be ran either either as part of the Supabase `build` command, or added as a `postbuild` script to `package.json` as follows:
+
+```json
+{
+  // ...
+  "scripts": {
+    // ...
+    "postinstall": "prisma generate"
+  }
+}
+```
