@@ -27,13 +27,36 @@ export const AuthContextProvider = ({ children }) => {
 
   // listen for initial auth session
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Fetch initial session
+    const setData = async () => {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession()
+      if (error) throw error
       setSession(session)
-    })
+      // setUser(session?.user)
+      // setLoading(false)
+    }
+    // supabase.auth.getSession().then(({ data: { session } }) => {
+    //   setSession(session)
+    // })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+    // Listen for auth state changes
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+        // setUser(session?.user)
+        // setLoading(false)
+      }
+    )
+
+    setData()
+
+    // supabase.auth.onAuthStateChange((_event, session) => {
+    //   setSession(session)
+    // })
+    return () => listener?.subscription.unsubscribe()
   }, [])
 
   /**
@@ -98,11 +121,6 @@ export const AuthContextProvider = ({ children }) => {
     signUpNewUser,
     signInUser,
     signOutUser,
-    // user,
-    // loading,
-    // signIn: (email, password) =>
-    //   supabase.auth.signInWithPassword({ email, password }),
-    // signOut: () => supabase.auth.signOut(),
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

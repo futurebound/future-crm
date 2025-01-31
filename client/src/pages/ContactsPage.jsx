@@ -1,6 +1,7 @@
 import { Mail, Notebook, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
+import AddContactButton from '@/components/AddContactButton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -44,6 +45,10 @@ export default function ContactsPage() {
     }
   }, [session?.access_token])
 
+  const handleContactAdded = (newContact) => {
+    setContacts((prevContacts) => [...prevContacts, newContact])
+  }
+
   if (loading)
     return (
       <div className='space-y-4 p-4'>
@@ -64,7 +69,7 @@ export default function ContactsPage() {
     )
 
   return (
-    <div className='container mx-auto space-y-6 p-6'>
+    <div className='container mx-auto mb-16 space-y-6 p-6'>
       <h1>Contacts Page</h1>
       <h2>Welcome, {session?.user?.email}</h2>
       <div className='space-y-2'>
@@ -111,6 +116,7 @@ export default function ContactsPage() {
           )}
         </div>
       </ScrollArea>
+      <AddContactButton onContactAdded={handleContactAdded} />
     </div>
   )
 }

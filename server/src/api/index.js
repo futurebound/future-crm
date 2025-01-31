@@ -1,15 +1,15 @@
 const { Router } = require('express')
+const apiRouter = Router()
 
-const router = Router()
-
-const authRouter = require('./routes/authRouter')
+const profilesRouter = require('./routes/profiles')
+const contactsRouter = require('./routes/contacts')
 
 // GET /api/v1
-router.get('/', (req, res) => {
-  res.json({ message: 'hi from api/v1' })
-})
+// router.get('/', (req, res) => {
+//   res.json({ message: 'hi from api/v1' })
+// })
 
-// /api/v1/auth
-router.use('/auth', authRouter)
+apiRouter.use('/profiles', profilesRouter)
+apiRouter.use('/contacts', contactsRouter)
 
-module.exports = router
+module.exports = apiRouter

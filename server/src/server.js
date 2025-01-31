@@ -2,14 +2,14 @@ const express = require('express')
 // const helmet = require('helmet')
 const app = express()
 const cors = require('cors')
-const api = require('./api/index')
-
-const authenticateUser = require('./middlewares/supabaseAuth')
-const prisma = require('./utils/prismaClient')
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
+
+const authenticateUser = require('./middlewares/supabaseAuth')
+const prisma = require('./utils/prismaClient')
+// const apiRouter = require('./api/index')
 
 // app.use(helmet())
 app.use(
@@ -33,8 +33,6 @@ app.use(express.urlencoded({ extended: true }))
 app.get('/', (req, res) => {
   res.json({ message: 'get /', env: process.env.NODE_ENV })
 })
-
-app.use('/api/v1', api)
 
 app.get('/api/v1/profiles', authenticateUser, async (req, res) => {
   console.log('attempting to get user profile')
