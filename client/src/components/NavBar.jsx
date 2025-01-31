@@ -5,11 +5,9 @@ import { Button } from '@/components/ui/button'
 
 import { UserAuth } from '@/context/AuthContext'
 
-export default function NavBar() {
-  const { session, signOutUser } = UserAuth()
+export default function NavBar({ session }) {
+  const { signOutUser } = UserAuth()
   const navigate = useNavigate()
-
-  console.log(session)
 
   const handleSignOut = async (e) => {
     e.preventDefault()
