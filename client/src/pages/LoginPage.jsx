@@ -37,7 +37,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      console.log('Sign-in payload:', formData)
+      // console.log('Sign-in payload:', formData)
       const result = await signInUser(formData.email, formData.password)
 
       if (result.success) {
@@ -45,7 +45,7 @@ export default function LoginPage() {
           title: 'Success',
           description: 'Login successful',
         })
-        console.log('result:', result)
+        // console.log('result:', result)
         navigate('/dashboard')
       }
     } catch (err) {

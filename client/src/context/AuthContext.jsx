@@ -21,7 +21,7 @@ export const AuthContextProvider = ({ children }) => {
       return { success: false, error: error.message }
     }
 
-    console.log(data)
+    // console.log(data)
     return { success: true, data }
   }
 
@@ -51,7 +51,7 @@ export const AuthContextProvider = ({ children }) => {
         return { success: false, error: error.message }
       }
 
-      console.log('sign in success:', data)
+      // console.log('sign in success:', data)
       return { success: true, data }
     } catch (error) {
       console.error('error occurred signing in user:', error)
