@@ -48,8 +48,20 @@ app.get('/api/v1/profiles', authenticateUser, async (req, res) => {
   }
 })
 
+app.get('/api/v1/contacts', authenticateUser, async (req, res) => {
+  console.log('attempting to get all contacts')
+  try {
+    const contacts = await prisma.contact.findMany({
+      where: { ownerId: req.userId },
+    })
+    res.json(contacts)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch contacts ' })
+  }
+})
+
 app.post('/api/v1/contacts', authenticateUser, async (req, res) => {
-  console.log('attempting to create new company')
+  console.log('attempting to create new contact')
   try {
     const { name, email, phone, notes, companyId } = req.body
 
