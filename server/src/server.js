@@ -4,6 +4,9 @@ const app = express()
 const cors = require('cors')
 const api = require('./api/index')
 
+const authenticateUser = require('./middlewares/supabaseAuth')
+const prisma = require('./utils/prismaClient')
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
@@ -33,18 +36,16 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1', api)
 
-app.get('/api/v1/user/profile', async (req, res) => {
-  const authId = req.user?.id
-  if (!authId) return res.status(401).json({ error: 'Unauthorized' })
-
-  const user = await prisma.user.findUnique({
-    where: { authId },
-    select: { id: true, email: true, role: true }, // Add other fields as needed
-  })
-
-  if (!user) return res.status(404).json({ error: 'User not found' })
-
-  res.json(user)
+app.get('/api/v1/profile', authenticateUser, async (req, res) => {
+  console.log('attempting to get user profile')
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { userId: req.userId },
+    })
+    res.json(profile)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch profile ' })
+  }
 })
 
 /**
