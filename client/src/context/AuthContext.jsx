@@ -27,36 +27,13 @@ export const AuthContextProvider = ({ children }) => {
 
   // listen for initial auth session
   useEffect(() => {
-    // Fetch initial session
-    const setData = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession()
-      if (error) throw error
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      // setUser(session?.user)
-      // setLoading(false)
-    }
-    // supabase.auth.getSession().then(({ data: { session } }) => {
-    //   setSession(session)
-    // })
+    })
 
-    // Listen for auth state changes
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session)
-        // setUser(session?.user)
-        // setLoading(false)
-      }
-    )
-
-    setData()
-
-    // supabase.auth.onAuthStateChange((_event, session) => {
-    //   setSession(session)
-    // })
-    return () => listener?.subscription.unsubscribe()
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
   }, [])
 
   /**
