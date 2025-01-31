@@ -18,7 +18,7 @@ export default function LoginPage() {
   })
   const [loading, setLoading] = useState(false)
 
-  const { session, signInUser } = UserAuth()
+  const { signInUser } = UserAuth()
 
   /**
    * Update form fields

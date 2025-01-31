@@ -7,11 +7,8 @@ import NavBar from './components/NavBar'
 import { UserAuth } from '@/context/AuthContext'
 
 function App() {
-  const { session } = UserAuth()
-
   return (
     <>
-      <NavBar session={session} />
       <main className='flex-grow'>
         <Outlet />
         <Toaster />
