@@ -45,7 +45,7 @@ export default function LoginPage() {
           title: 'Success',
           description: 'Login successful',
         })
-        // console.log('result:', result)
+        console.log('result:', result)
         navigate('/dashboard')
       }
     } catch (err) {
