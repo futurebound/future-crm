@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1', api)
 
-app.get('/api/v1/profile', authenticateUser, async (req, res) => {
+app.get('/api/v1/profiles', authenticateUser, async (req, res) => {
   console.log('attempting to get user profile')
   try {
     const profile = await prisma.profile.findUnique({
@@ -45,6 +45,53 @@ app.get('/api/v1/profile', authenticateUser, async (req, res) => {
     res.json(profile)
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch profile ' })
+  }
+})
+
+app.post('/api/v1/contacts', authenticateUser, async (req, res) => {
+  console.log('attempting to create new company')
+  try {
+    const { name, email, phone, notes, companyId } = req.body
+
+    // Validate required fields
+    if (!name) {
+      return res.status(400).json({
+        error: 'Contact name is required',
+      })
+    }
+
+    // Create the contact
+    const newContact = await prisma.contact.create({
+      data: {
+        name,
+        email,
+        phone,
+        notes,
+        ownerId: req.userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        notes: true,
+      },
+    })
+
+    res.status(201).json(newContact)
+  } catch (error) {
+    console.error('Contact creation error:', error)
+
+    // Handle Prisma errors
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        error: 'Contact with this email already exists',
+      })
+    }
+
+    res.status(500).json({
+      error: 'Failed to create contact',
+    })
   }
 })
 
