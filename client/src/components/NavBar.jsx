@@ -1,24 +1,9 @@
-import { Building2, Home, MessagesSquare, Users } from 'lucide-react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Building2, Home, MessagesSquare, User, Users } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 
-import { UserAuth } from '@/context/AuthContext'
-
-export default function NavBar({ session }) {
-  const { signOutUser } = UserAuth()
-  const navigate = useNavigate()
-
-  const handleSignOut = async (e) => {
-    e.preventDefault()
-    try {
-      await signOutUser()
-      navigate('/')
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
+export default function NavBar() {
   return (
     <nav className='fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex h-16 justify-around'>
@@ -66,16 +51,16 @@ export default function NavBar({ session }) {
           </NavLink>
         </Button>
 
-        {session ? (
-          <Button
-            className='flex h-auto flex-col gap-1 px-2 py-3 text-xs'
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </Button>
-        ) : (
-          <Link to='/login'>Login</Link>
-        )}
+        <Button
+          asChild
+          variant='ghost'
+          className='flex h-auto flex-col gap-1 px-2 py-3 text-xs'
+        >
+          <NavLink to='/profile'>
+            <User className='h-4 w-4' />
+            <span>Profile</span>
+          </NavLink>
+        </Button>
       </div>
     </nav>
   )

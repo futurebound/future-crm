@@ -1,5 +1,4 @@
 import App from './App'
-import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
 import CompaniesPage from './pages/CompaniesPage'
 import ContactsPage from './pages/ContactsPage'
@@ -7,6 +6,7 @@ import DashboardPage from './pages/DashboardPage'
 import HomePage from './pages/HomePage'
 import InteractionsPage from './pages/InteractionsPage'
 import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
 import SignupPage from './pages/SignupPage'
 
 const routes = [
@@ -55,6 +55,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <InteractionsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/profile',
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         ),
       },
