@@ -58,7 +58,16 @@ export default function ProfilePage() {
   if (error)
     return (
       <Alert variant='destructive' className='m-4'>
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>
+          {error}
+          <Button
+            variant='destructive'
+            onClick={handleSignOut}
+            className='w-full'
+          >
+            Sign Out
+          </Button>
+        </AlertDescription>
       </Alert>
     )
 
