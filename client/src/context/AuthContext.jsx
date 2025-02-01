@@ -1,13 +1,46 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 
 import { supabase } from '@/lib/supabase'
 
 const AuthContext = createContext()
 
 export const AuthContextProvider = ({ children }) => {
-  // const [user, setUser] = useState()
-  const [session, setSession] = useState(undefined)
-  // const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  /**
+   * Direct handling of auth session state changes to prevent stale sessions
+   */
+  const handleAuthStateChange = useCallback(async (event, session) => {
+    /**
+     * Add session validation check
+     */
+    const validateSession = (session) => {
+      if (!session) return false
+      const expiresAt = new Date(session.expires_at * 1000)
+      return expiresAt > new Date()
+    }
+
+    if (event === 'INITIAL_SESSION') {
+      setLoading(true)
+    }
+
+    const isValid = validateSession(session)
+    setSession(isValid ? session : null)
+
+    // Force token refresh check
+    if (session && !isValid) {
+      await supabase.auth.signOut()
+    }
+
+    setLoading(false)
+  }, [])
 
   // Signup Use
   const signUpNewUser = async (email, password) => {
@@ -26,15 +59,48 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   // listen for initial auth session
+  // useEffect(() => {
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     setSession(session)
+  //   })
+
+  //   supabase.auth.onAuthStateChange((_event, session) => {
+  //     setSession(session)
+  //   })
+  // }, [])
+
   useEffect(() => {
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
+      handleAuthStateChange('INITIAL_SESSION', session)
     })
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
+    // Auth state listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange)
+
+    // Auto-logout timer
+    let expirationTimer
+    const setupExpirationCheck = () => {
+      if (session?.expires_at) {
+        const expiresIn = session.expires_at * 1000 - Date.now()
+        expirationTimer = setTimeout(
+          () => {
+            supabase.auth.signOut()
+          },
+          Math.max(expiresIn, 0)
+        )
+      }
+    }
+
+    setupExpirationCheck()
+
+    return () => {
+      subscription?.unsubscribe()
+      clearTimeout(expirationTimer)
+    }
+  }, [handleAuthStateChange, session?.expires_at])
 
   /**
    * Sign in existing user
@@ -60,47 +126,28 @@ export const AuthContextProvider = ({ children }) => {
 
   // Sign Out user
   const signOutUser = () => {
+    setLoading(true)
     const { error } = supabase.auth.signOut()
+    setSession(null)
+    setLoading(false)
     if (error) {
       console.error('error in signout:', error)
     }
   }
 
-  // useEffect(() => {
-  //   // Fetch initial session
-  //   const setData = async () => {
-  //     const {
-  //       data: { session },
-  //       error,
-  //     } = await supabase.auth.getSession()
-  //     if (error) throw error
-  //     setSession(session)
-  //     setUser(session?.user)
-  //     setLoading(false)
-  //   }
-
-  //   // Listen for auth state changes
-  //   const { data: listener } = supabase.auth.onAuthStateChange(
-  //     (_event, session) => {
-  //       setSession(session)
-  //       setUser(session?.user)
-  //       setLoading(false)
-  //     }
-  //   )
-
-  //   setData()
-
-  //   return () => listener?.subscription.unsubscribe()
-  // }, [])
-
   const value = {
     session,
+    loading,
     signUpNewUser,
     signInUser,
     signOutUser,
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  )
 }
 
 export const UserAuth = () => useContext(AuthContext)
