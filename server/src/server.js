@@ -144,6 +144,39 @@ app.put('/api/v1/contacts/:contactId', authenticateUser, async (req, res) => {
   }
 })
 
+app.delete(
+  '/api/v1/contacts/:contactId',
+  authenticateUser,
+  async (req, res) => {
+    try {
+      const { contactId } = req.params
+
+      // Verify contact exists and belongs to user
+      const contact = await prisma.contact.findUnique({
+        where: { id: contactId },
+      })
+
+      if (!contact) {
+        return res.status(404).json({ error: 'Contact not found' })
+      }
+
+      if (contact.ownerId !== req.userId) {
+        return res.status(403).json({ error: 'Unauthorized' })
+      }
+
+      // Delete the contact
+      await prisma.contact.delete({
+        where: { id: contactId },
+      })
+
+      res.status(204).send()
+    } catch (error) {
+      console.error('Contact deletion error:', error)
+      res.status(500).json({ error: 'Failed to delete contact' })
+    }
+  },
+)
+
 /**
  *  ---------------- SERVER ---------------
  */

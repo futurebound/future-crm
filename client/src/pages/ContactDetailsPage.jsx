@@ -1,10 +1,22 @@
 import { ArrowLeft, Mail, Notebook, Phone } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import DetailItem from '@/components/DetailItem'
 // import InteractionsTab from '@/components/InteractionsTab'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,6 +32,7 @@ export default function ContactDetailsPage() {
   const [contact, setContact] = useState(location.state?.contact)
   const [loading, setLoading] = useState(!location.state?.contact)
   const [error, setError] = useState(null)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -55,8 +68,6 @@ export default function ContactDetailsPage() {
     return () => controller.abort()
   }, [contactId, session?.access_token, navigate, location.state])
 
-  const [updating, setUpdating] = useState(false)
-
   const handleUpdate = async (field, value) => {
     setUpdating(true)
     try {
@@ -86,19 +97,70 @@ export default function ContactDetailsPage() {
     }
   }
 
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/contacts/${contactId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to delete contact')
+      }
+
+      navigate('/contacts', { replace: true })
+    } catch (err) {
+      console.error('Delete error:', err)
+      setError(err.message)
+    }
+  }
+
   if (loading) return <DetailSkeleton />
   if (error) return <ErrorAlert error={error} />
-  if (!contact) return <NotFound />
+  if (!contact) return <NotFound navigate={navigate} />
 
   return (
     <div className='container mx-auto space-y-6 p-6'>
-      <div className='flex items-center gap-4'>
-        <Button asChild variant='ghost' size='icon'>
-          <Link to='/contacts'>
-            <ArrowLeft className='h-4 w-4' />
-          </Link>
-        </Button>
-        <h1 className='text-3xl font-bold'>{contact.name}</h1>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-4'>
+          <Button asChild variant='ghost' size='icon'>
+            <Link to='/contacts'>
+              <ArrowLeft className='h-4 w-4' />
+            </Link>
+          </Button>
+          <h1 className='text-3xl font-bold'>{contact.name}</h1>
+        </div>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant='destructive' size='icon' className='shrink-0'>
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete {contact.name}? This action
+                cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <Tabs defaultValue='details' className='w-full'>
@@ -159,7 +221,7 @@ const ErrorAlert = ({ error }) => (
   </Alert>
 )
 
-const NotFound = () => (
+const NotFound = ({ navigate }) => (
   <div className='container mx-auto p-6'>
     <div className='flex items-center gap-4'>
       <Button variant='ghost' size='icon' onClick={() => navigate(-1)}>
