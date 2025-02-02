@@ -55,6 +55,37 @@ export default function ContactDetailsPage() {
     return () => controller.abort()
   }, [contactId, session?.access_token, navigate, location.state])
 
+  const [updating, setUpdating] = useState(false)
+
+  const handleUpdate = async (field, value) => {
+    setUpdating(true)
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/contacts/${contactId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            ...contact,
+            [field]: value,
+          }),
+        }
+      )
+
+      if (!response.ok) throw new Error('Failed to update contact')
+
+      const updatedContact = await response.json()
+      setContact(updatedContact)
+    } catch (err) {
+      console.error('Update error:', err)
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   if (loading) return <DetailSkeleton />
   if (error) return <ErrorAlert error={error} />
   if (!contact) return <NotFound />
@@ -79,13 +110,27 @@ export default function ContactDetailsPage() {
         <TabsContent value='details'>
           <Card className='p-6'>
             <div className='space-y-4'>
-              <DetailItem icon={Mail} label='Email' value={contact.email} />
-              <DetailItem icon={Phone} label='Phone' value={contact.phone} />
+              <DetailItem
+                icon={Mail}
+                label='Email'
+                value={contact.email}
+                onSave={(value) => handleUpdate('email', value)}
+                disabled={updating}
+              />
+              <DetailItem
+                icon={Phone}
+                label='Phone'
+                value={contact.phone}
+                onSave={(value) => handleUpdate('phone', value)}
+                disabled={updating}
+              />
               <DetailItem
                 icon={Notebook}
                 label='Notes'
                 value={contact.notes}
                 multiline
+                onSave={(value) => handleUpdate('notes', value)}
+                disabled={updating}
               />
             </div>
           </Card>

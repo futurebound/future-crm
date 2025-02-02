@@ -105,6 +105,45 @@ app.post('/api/v1/contacts', authenticateUser, async (req, res) => {
   }
 })
 
+app.put('/api/v1/contacts/:contactId', authenticateUser, async (req, res) => {
+  try {
+    const { contactId } = req.params
+    const { name, email, phone, notes } = req.body
+
+    // Validate required fields
+    if (!name) {
+      return res.status(400).json({
+        error: 'Contact name is required',
+      })
+    }
+
+    const updatedContact = await prisma.contact.update({
+      where: {
+        id: contactId,
+        ownerId: req.userId, // Ensure user owns this contact
+      },
+      data: {
+        name,
+        email,
+        phone,
+        notes,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        notes: true,
+      },
+    })
+
+    res.json(updatedContact)
+  } catch (error) {
+    console.error('Contact update error:', error)
+    res.status(500).json({ error: 'Failed to update contact' })
+  }
+})
+
 /**
  *  ---------------- SERVER ---------------
  */
