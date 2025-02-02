@@ -1,5 +1,6 @@
 import { Mail, Notebook, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import AddContactButton from '@/components/AddContactButton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -10,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { UserAuth } from '@/context/AuthContext'
 
 export default function ContactsPage() {
+  const navigate = useNavigate()
   const { session } = UserAuth()
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -70,8 +72,6 @@ export default function ContactsPage() {
 
   return (
     <div className='container mx-auto mb-16 space-y-6 p-6'>
-      <h1>Contacts Page</h1>
-      <h2>Welcome, {session?.user?.email}</h2>
       <div className='space-y-2'>
         <h1 className='text-3xl font-bold tracking-tight'>Contacts</h1>
         <p className='text-muted-foreground'>
@@ -87,7 +87,15 @@ export default function ContactsPage() {
             </p>
           ) : (
             contacts.map((contact) => (
-              <Card key={contact.id}>
+              <Card
+                key={contact.id}
+                className='cursor-pointer transition-colors hover:bg-accent/50'
+                onClick={() =>
+                  navigate(`/contacts/${contact.id}`, {
+                    state: { contact }, // Pass contact data via state
+                  })
+                }
+              >
                 <CardHeader>
                   <h3 className='text-lg font-semibold'>{contact.name}</h3>
                 </CardHeader>

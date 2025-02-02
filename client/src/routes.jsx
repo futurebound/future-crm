@@ -1,6 +1,7 @@
 import App from './App'
 import ProtectedRoute from './components/ProtectedRoute'
 import CompaniesPage from './pages/CompaniesPage'
+import ContactDetailsPage from './pages/ContactDetailsPage'
 import ContactsPage from './pages/ContactsPage'
 import DashboardPage from './pages/DashboardPage'
 import HomePage from './pages/HomePage'
@@ -39,6 +40,14 @@ const routes = [
         element: (
           <ProtectedRoute>
             <ContactsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/contacts/:contactId',
+        element: (
+          <ProtectedRoute>
+            <ContactDetailsPage />
           </ProtectedRoute>
         ),
       },
