@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -25,11 +26,19 @@ export default function ContactsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [sortOrder, setSortOrder] = useState('desc')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const sortOptions = [
     { value: 'desc', label: 'Newest First' },
     { value: 'asc', label: 'Oldest First' },
   ]
+
+  // Add fuzzy search filtering
+  const filteredContacts = contacts.filter((contact) => {
+    if (!searchTerm) return true
+    const searchLower = searchTerm.toLowerCase()
+    return contact.name?.toLowerCase().includes(searchLower)
+  })
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -112,14 +121,28 @@ export default function ContactsPage() {
         </DropdownMenu>
       </div>
 
+      <div className='flex items-center gap-4'>
+        {/* New Search Input */}
+        <Input
+          placeholder='Search contacts...'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='max-w-[300px]'
+        />
+        {/* Existing Sort Dropdown */}
+        <DropdownMenu>{/* ... existing dropdown code ... */}</DropdownMenu>
+      </div>
+
       <ScrollArea className='h-[calc(100vh-200px)]'>
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {contacts.length === 0 ? (
+          {filteredContacts.length === 0 ? (
             <p className='col-span-full py-8 text-center text-muted-foreground'>
-              No contacts found. Add your first contact to get started.
+              {contacts.length === 0
+                ? 'No contacts found. Add your first contact to get started.'
+                : `No matches for "${searchTerm}"`}
             </p>
           ) : (
-            [...contacts]
+            [...filteredContacts]
               .sort((a, b) => {
                 const dateA = new Date(a.createdAt)
                 const dateB = new Date(b.createdAt)
