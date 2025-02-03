@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Mail, Notebook, Phone } from 'lucide-react'
 import { Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -26,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserAuth } from '@/context/AuthContext'
 
 export default function ContactDetailsPage() {
+  const queryClient = useQueryClient()
   const { contactId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -110,14 +112,20 @@ export default function ContactDetailsPage() {
         }
       )
 
-      if (!response.ok) {
-        throw new Error('Failed to delete contact')
-      }
+      if (!response.ok) throw new Error('Failed to delete contact')
+
+      // Invalidate queries and update cache
+      await Promise.all([
+        queryClient.invalidateQueries(['contacts']),
+        queryClient.removeQueries(['contact', contactId]),
+      ])
 
       navigate('/contacts', { replace: true })
     } catch (err) {
       console.error('Delete error:', err)
       setError(err.message)
+      // Optional: Re-fetch contacts to ensure consistency
+      queryClient.invalidateQueries(['contacts'])
     }
   }
 

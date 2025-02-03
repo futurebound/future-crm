@@ -51,6 +51,9 @@ app.get('/api/v1/contacts', authenticateUser, async (req, res) => {
   try {
     const contacts = await prisma.contact.findMany({
       where: { ownerId: req.userId },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
     res.json(contacts)
   } catch (error) {
