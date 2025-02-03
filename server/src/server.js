@@ -85,6 +85,7 @@ app.post('/api/v1/contacts', authenticateUser, async (req, res) => {
         email: true,
         phone: true,
         notes: true,
+        createdAt: true,
       },
     })
 
@@ -134,6 +135,7 @@ app.put('/api/v1/contacts/:contactId', authenticateUser, async (req, res) => {
         email: true,
         phone: true,
         notes: true,
+        createdAt: true,
       },
     })
 

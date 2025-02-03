@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Mail, Notebook, Phone } from 'lucide-react'
 import { ArrowDownUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -22,16 +23,63 @@ import { UserAuth } from '@/context/AuthContext'
 export default function ContactsPage() {
   const navigate = useNavigate()
   const { session } = UserAuth()
-  const [contacts, setContacts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // const [contacts, setContacts] = useState([])
+  // const [loading, setLoading] = useState(true)
+  // const [error, setError] = useState(null)
+  const queryClient = useQueryClient()
+
   const [sortOrder, setSortOrder] = useState('desc')
   const [searchTerm, setSearchTerm] = useState('')
 
   const sortOptions = [
-    { value: 'desc', label: 'Newest First' },
-    { value: 'asc', label: 'Oldest First' },
+    { value: 'desc', label: 'Recent' },
+    { value: 'asc', label: 'Oldest' },
   ]
+
+  // React Query fetch contacts
+  const {
+    data: contacts = [],
+    error,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
+    },
+    enabled: !!session?.access_token,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache freshness
+    retry: 2,
+    onError: (error) => {
+      console.error('Contacts fetch error:', error)
+    },
+    initialData: () => {
+      // Fallback to localStorage cache if available
+      try {
+        const cached = localStorage.getItem('contactsCache')
+        return cached ? JSON.parse(cached) : undefined
+      } catch (e) {
+        console.error('LocalStorage read error:', e)
+        return undefined
+      }
+    },
+  })
+
+  // Sort and filter contacts
+  const sortedContacts = [...contacts].sort((a, b) => {
+    const dateA = new Date(a.createdAt)
+    const dateB = new Date(b.createdAt)
+    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+  })
 
   // Add fuzzy search filtering
   const filteredContacts = contacts.filter((contact) => {
@@ -40,41 +88,43 @@ export default function ContactsPage() {
     return contact.name?.toLowerCase().includes(searchLower)
   })
 
-  useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/contacts`,
-          {
-            headers: {
-              Authorization: `Bearer ${session?.access_token}`,
-            },
-          }
-        )
+  // Update localStorage cache when data changes
+  // const updateLocalCache = (data) => {
+  //   try {
+  //     localStorage.setItem('contactsCache', JSON.stringify(data))
+  //   } catch (e) {
+  //     console.error('LocalStorage write error:', e)
+  //   }
+  // }
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch contacts')
-        }
-
-        const data = await response.json()
-        setContacts(data)
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (session?.access_token) {
-      fetchContacts()
-    }
-  }, [session?.access_token])
-
+  // Handle contact additions with optimistic updates
   const handleContactAdded = (newContact) => {
-    setContacts((prevContacts) => [...prevContacts, newContact])
+    queryClient.setQueryData(['contacts'], (old) => {
+      const tempContact = {
+        ...newContact,
+        createdAt: new Date().toISOString(), // Add temporary timestamp
+      }
+
+      const updated = [tempContact, ...(old || [])]
+      updated.sort((a, b) => {
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+      })
+
+      localStorage.setItem('contactsCache', JSON.stringify(updated))
+      return updated
+    })
   }
 
-  if (loading)
+  useEffect(() => {
+    if (contacts) {
+      localStorage.setItem('contactsCache', JSON.stringify(contacts))
+    }
+  }, [contacts])
+
+  // Loading state
+  if (isLoading) {
     return (
       <div className='space-y-4 p-4'>
         <Skeleton className='h-12 w-[250px]' />
@@ -85,13 +135,25 @@ export default function ContactsPage() {
         </div>
       </div>
     )
+  }
 
-  if (error)
+  // Error state
+  if (isError) {
     return (
       <Alert variant='destructive' className='m-4'>
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>
+          {error.message || 'Failed to load contacts'}
+          <Button
+            variant='ghost'
+            className='ml-4'
+            onClick={() => queryClient.refetchQueries(['contacts'])}
+          >
+            Retry
+          </Button>
+        </AlertDescription>
       </Alert>
     )
+  }
 
   return (
     <div className='container mx-auto mb-16 space-y-6 p-6'>
@@ -100,37 +162,35 @@ export default function ContactsPage() {
           <h1 className='text-3xl font-bold tracking-tight'>Contacts</h1>
         </div>
 
-        {/* Sorting Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='gap-2'>
-              <ArrowDownUp className='h-4 w-4' />
-              {sortOptions.find((opt) => opt.value === sortOrder)?.label}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {sortOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onClick={() => setSortOrder(option.value)}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className='flex items-center gap-4'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' className='gap-2'>
+                <ArrowDownUp className='h-4 w-4' />
+                {sortOptions.find((opt) => opt.value === sortOrder)?.label}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {sortOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => setSortOrder(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      <div className='flex items-center gap-4'>
-        {/* New Search Input */}
+      <div>
         <Input
           placeholder='Search contacts...'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className='max-w-[300px]'
         />
-        {/* Existing Sort Dropdown */}
-        <DropdownMenu>{/* ... existing dropdown code ... */}</DropdownMenu>
       </div>
 
       <ScrollArea className='h-[calc(100vh-200px)]'>
@@ -142,51 +202,62 @@ export default function ContactsPage() {
                 : `No matches for "${searchTerm}"`}
             </p>
           ) : (
-            [...filteredContacts]
-              .sort((a, b) => {
-                const dateA = new Date(a.createdAt)
-                const dateB = new Date(b.createdAt)
-                return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
-              })
-              .map((contact) => (
-                <Card
-                  key={contact.id}
-                  className='cursor-pointer transition-colors hover:bg-accent/50'
-                  onClick={() =>
-                    navigate(`/contacts/${contact.id}`, {
-                      state: { contact }, // Pass contact data via state
-                    })
-                  }
-                >
-                  <CardHeader>
+            filteredContacts.map((contact) => (
+              <Card
+                key={contact.id}
+                className='cursor-pointer transition-colors hover:bg-accent/50'
+                onClick={() =>
+                  navigate(`/contacts/${contact.id}`, {
+                    state: { contact },
+                  })
+                }
+              >
+                <CardHeader>
+                  <div className='flex items-center justify-between'>
                     <h3 className='text-lg font-semibold'>{contact.name}</h3>
-                  </CardHeader>
-                  <CardContent className='space-y-2'>
-                    {contact.email && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Mail className='h-4 w-4' />
-                        <span>{contact.email}</span>
-                      </div>
-                    )}
-                    {contact.phone && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Phone className='h-4 w-4' />
-                        <span>{contact.phone}</span>
-                      </div>
-                    )}
-                    {contact.notes && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Notebook className='h-4 w-4' />
-                        <span className='line-clamp-2'>{contact.notes}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
+                    <span className='text-xs text-muted-foreground'>
+                      Met{' '}
+                      {new Date(contact.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className='space-y-2'>
+                  {contact.email && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Mail className='h-4 w-4' />
+                      <span className='truncate'>{contact.email}</span>
+                    </div>
+                  )}
+                  {contact.phone && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Phone className='h-4 w-4' />
+                      <span>{contact.phone}</span>
+                    </div>
+                  )}
+                  {contact.notes && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Notebook className='h-4 w-4' />
+                      <span className='line-clamp-2'>{contact.notes}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
           )}
         </div>
       </ScrollArea>
-      <AddContactButton onContactAdded={handleContactAdded} />
+
+      <AddContactButton
+        onContactAdded={handleContactAdded}
+        onError={(error) => {
+          console.error('Add contact error:', error)
+          queryClient.invalidateQueries(['contacts'])
+        }}
+      />
     </div>
   )
 }
