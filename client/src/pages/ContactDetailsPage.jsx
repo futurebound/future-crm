@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import DetailItem from '@/components/DetailItem'
+import InteractionsTab from '@/components/InteractionsTab'
 // import InteractionsTab from '@/components/InteractionsTab'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
@@ -198,9 +199,9 @@ export default function ContactDetailsPage() {
           </Card>
         </TabsContent>
 
-        {/* <TabsContent value='interactions'>
+        <TabsContent value='interactions'>
           <InteractionsTab contactId={contactId} />
-        </TabsContent> */}
+        </TabsContent>
       </Tabs>
     </div>
   )

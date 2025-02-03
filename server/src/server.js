@@ -202,6 +202,84 @@ app.get('/api/v1/interactions', authenticateUser, async (req, res) => {
 })
 
 /**
+ * GET interactions for a specific contact
+ */
+app.get(
+  '/api/v1/contacts/:contactId/interactions',
+  authenticateUser,
+  async (req, res) => {
+    try {
+      const { contactId } = req.params
+      const interactions = await prisma.interaction.findMany({
+        where: {
+          contactId,
+          ownerId: req.userId,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+      res.json(interactions)
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch interactions' })
+    }
+  },
+)
+
+/**
+ * POST new interaction for a contact
+ */
+app.post(
+  '/api/v1/contacts/:contactId/interactions',
+  authenticateUser,
+  async (req, res) => {
+    try {
+      const { contactId } = req.params
+      const { type, notes } = req.body
+
+      // Validate input
+      if (!type || !notes) {
+        return res.status(400).json({ error: 'Type and notes are required' })
+      }
+
+      // 1. Verify contact exists and belongs to user
+      const contact = await prisma.contact.findUnique({
+        where: { id: contactId },
+        select: { ownerId: true },
+      })
+
+      if (!contact || contact.ownerId !== req.userId) {
+        return res.status(404).json({ error: 'Contact not found' })
+      }
+
+      // 2. Verify user profile exists
+      const profile = await prisma.profile.findUnique({
+        where: { userId: req.userId },
+      })
+
+      if (!profile) {
+        return res.status(403).json({ error: 'User profile not found' })
+      }
+
+      // 3. Create interaction with validated relations
+      const newInteraction = await prisma.interaction.create({
+        data: {
+          type,
+          notes,
+          contact: { connect: { id: contactId } },
+          owner: { connect: { userId: req.userId } },
+        },
+      })
+
+      res.status(201).json(newInteraction)
+    } catch (error) {
+      console.error('Interaction creation error:', error)
+      res.status(500).json({ error: 'Failed to create interaction' })
+    }
+  },
+)
+
+/**
  *  ---------------- SERVER ---------------
  */
 if (process.env.NODE_ENV !== 'production') {
