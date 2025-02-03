@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export default function NavBar() {
   return (
-    <nav className='fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+    <nav className='fixed left-0 right-0 top-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex h-16 justify-around'>
         <Button
           asChild

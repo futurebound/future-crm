@@ -11,11 +11,11 @@ function App() {
 
   return (
     <>
-      <main className='flex-grow'>
+      {session && <NavBar session={session} />}
+      <main className='mt-16 flex-grow'>
         <Outlet />
         <Toaster />
       </main>
-      {session && <NavBar session={session} />}
     </>
   )
 }

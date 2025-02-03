@@ -84,9 +84,13 @@ export default function InteractionsTab({ contactId }) {
         {interactions.map((interaction) => (
           <Card key={interaction.id} className='p-4'>
             <div className='flex justify-between'>
-              <div className='font-semibold'>{interaction.type}</div>
+              <div className='font-semibold'>
+                {interaction.type.charAt(0) +
+                  interaction.type.slice(1).toLowerCase()}
+              </div>
               <div className='text-sm text-muted-foreground'>
-                {new Date(interaction.date).toLocaleDateString()}
+                {/* {new Date(interaction.date).toLocaleDateString()} */}
+                {new Date(interaction.createdAt).toLocaleDateString()}
               </div>
             </div>
             <p className='mt-2'>{interaction.notes}</p>

@@ -65,7 +65,7 @@ export default function AddContactButton({ onContactAdded }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className='fixed bottom-20 right-6 z-50 h-14 w-14 rounded-full shadow-lg'
+          className='fixed bottom-8 right-6 z-50 h-14 w-14 rounded-full shadow-lg'
           size='icon'
         >
           <Plus className='h-6 w-6' />
