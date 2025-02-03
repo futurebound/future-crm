@@ -41,11 +41,6 @@ export default function LoginPage() {
       const result = await signInUser(formData.email, formData.password)
 
       if (result.success) {
-        toast({
-          title: 'Success',
-          description: 'Login successful',
-        })
-        // console.log('result:', result)
         navigate('/dashboard')
       }
     } catch (err) {

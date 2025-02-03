@@ -178,6 +178,30 @@ app.delete(
 )
 
 /**
+ * GET all interactions for the current user
+ */
+app.get('/api/v1/interactions', authenticateUser, async (req, res) => {
+  console.log('attempting to get all interactions')
+  try {
+    const interactions = await prisma.interaction.findMany({
+      where: { ownerId: req.userId },
+      include: {
+        contact: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    })
+    res.json(interactions)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch interactions' })
+  }
+})
+
+/**
  *  ---------------- SERVER ---------------
  */
 if (process.env.NODE_ENV !== 'production') {
