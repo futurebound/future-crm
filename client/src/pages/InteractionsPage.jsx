@@ -77,7 +77,7 @@ export default function InteractionsPage() {
   return (
     <div className='container mx-auto mb-16 space-y-6 p-6'>
       <div className='space-y-2'>
-        <h1 className='text-3xl font-bold tracking-tight'>Interactionos</h1>
+        <h1 className='text-3xl font-bold tracking-tight'>Interactions</h1>
       </div>
 
       {/* Search Field */}
@@ -102,31 +102,17 @@ export default function InteractionsPage() {
             [...filteredInteractions]
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((interaction) => (
-                <Card
-                  key={interaction.id}
-                  className='cursor-pointer transition-colors hover:bg-accent/50'
-                >
-                  <CardHeader>
-                    <h3 className='text-lg font-semibold'>
-                      {interaction.contact.name}
-                    </h3>
-                    <p className='text-sm text-muted-foreground'>
-                      {new Date(interaction.createdAt).toLocaleDateString()}
-                    </p>
-                  </CardHeader>
-                  <CardContent className='space-y-2'>
-                    <div className='flex items-center gap-2 text-sm'>
-                      <Calendar className='h-4 w-4' />
-                      <span>{interaction.type}</span>
+                <Card key={interaction.id} className='p-4'>
+                  <div className='flex justify-between'>
+                    <div className='font-semibold'>
+                      {`${interaction.contact.name} - ${interaction.type.charAt(0)}${interaction.type.slice(1).toLowerCase()}`}
                     </div>
-                    {interaction.contact.email && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Mail className='h-4 w-4' />
-                        <span>{interaction.contact.email}</span>
-                      </div>
-                    )}
-                    <div className='text-sm'>{interaction.notes}</div>
-                  </CardContent>
+                    <div className='text-sm text-muted-foreground'>
+                      {/* {new Date(interaction.date).toLocaleDateString()} */}
+                      {new Date(interaction.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <p className='mt-2'>{interaction.notes}</p>
                 </Card>
               ))
           )}

@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -76,10 +77,6 @@ export default function InteractionsTab({ contactId }) {
 
   return (
     <div className='space-y-4'>
-      <div className='flex justify-end'>
-        <AddInteractionDialog onSubmit={handleAddInteraction} />
-      </div>
-
       <div className='space-y-4'>
         {interactions.map((interaction) => (
           <Card key={interaction.id} className='p-4'>
@@ -96,6 +93,9 @@ export default function InteractionsTab({ contactId }) {
             <p className='mt-2'>{interaction.notes}</p>
           </Card>
         ))}
+      </div>
+      <div className='flex justify-end'>
+        <AddInteractionDialog onSubmit={handleAddInteraction} />
       </div>
     </div>
   )
@@ -121,7 +121,12 @@ function AddInteractionDialog({ onSubmit }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Interaction</Button>
+        <Button
+          className='fixed bottom-8 right-6 z-50 h-14 w-14 rounded-full shadow-lg'
+          size='icon'
+        >
+          <Plus className='h-6 w-6' />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

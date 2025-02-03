@@ -11,8 +11,9 @@ export default function NavBar() {
           asChild
           variant='ghost'
           className='flex h-auto flex-col gap-1 px-2 py-3 text-xs'
+          disabled
         >
-          <NavLink to='/dashboard'>
+          <NavLink to='/dashboard' onClick={(e) => e.preventDefault()}>
             <Home className='h-4 w-4' />
             <span>Dashboard</span>
           </NavLink>
@@ -29,16 +30,17 @@ export default function NavBar() {
           </NavLink>
         </Button>
 
-        <Button
+        {/* <Button
           asChild
           variant='ghost'
           className='flex h-auto flex-col gap-1 px-2 py-3 text-xs'
+          disabled
         >
-          <NavLink to='/companies'>
+          <NavLink to='/companies' onClick={(e) => e.preventDefault()}>
             <Building2 className='h-4 w-4' />
             <span>Companies</span>
           </NavLink>
-        </Button>
+        </Button> */}
 
         <Button
           asChild

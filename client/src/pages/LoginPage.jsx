@@ -41,7 +41,7 @@ export default function LoginPage() {
       const result = await signInUser(formData.email, formData.password)
 
       if (result.success) {
-        navigate('/dashboard')
+        navigate('/contacts')
       }
     } catch (err) {
       toast({
