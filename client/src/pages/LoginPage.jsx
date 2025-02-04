@@ -62,7 +62,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='container flex h-screen w-screen flex-col items-center justify-center'>
+    <div className='container flex h-[calc(100vh-4rem)] w-screen flex-col items-center justify-center'>
       <Card className='w-[350px]'>
         <CardHeader>
           <CardTitle>Login</CardTitle>

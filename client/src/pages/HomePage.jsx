@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function HomePage() {
   return (
-    <div className='container flex min-h-screen flex-col items-center justify-center'>
+    <div className='container flex h-[calc(100vh-4rem)] flex-col items-center justify-center'>
       {/* Logo Section */}
       <div className='mb-12 flex w-full justify-center'>
         <img src='vite.svg' alt='FutureCRM Logo' className='h-32 w-32' />
