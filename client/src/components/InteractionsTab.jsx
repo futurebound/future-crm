@@ -148,11 +148,11 @@ function AddInteractionDialog({ onSubmit }) {
             </SelectContent>
           </Select>
 
-          <Input
+          {/* <Input
             type='date'
             value={formData.date}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          />
+          /> */}
 
           <Textarea
             placeholder='Notes'
