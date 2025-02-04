@@ -44,12 +44,11 @@ export default function AddContactButton({ onContactAdded }) {
       }
 
       const newContact = await response.json()
+      if (!newContact.createdAt) {
+        newContact.createdAt = new Date().toISOString()
+      }
       onContactAdded(newContact)
       setOpen(false)
-      toast({
-        title: 'Success',
-        description: 'Contact created successfully',
-      })
     } catch (error) {
       toast({
         variant: 'destructive',

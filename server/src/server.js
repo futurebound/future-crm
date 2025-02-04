@@ -85,6 +85,7 @@ app.post('/api/v1/contacts', authenticateUser, async (req, res) => {
         email: true,
         phone: true,
         notes: true,
+        createdAt: true,
       },
     })
 

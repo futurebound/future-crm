@@ -57,7 +57,8 @@ export default function ContactsPage() {
         }
 
         const data = await response.json()
-        setContacts(data)
+        const sortedData = sortContacts(data, sortOrder)
+        setContacts(sortedData)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -68,10 +69,26 @@ export default function ContactsPage() {
     if (session?.access_token) {
       fetchContacts()
     }
-  }, [session?.access_token])
+  }, [session?.access_token, sortOrder])
 
   const handleContactAdded = (newContact) => {
-    setContacts((prevContacts) => [...prevContacts, newContact])
+    setContacts((prevContacts) => {
+      const newContacts = [...prevContacts, newContact]
+      return sortContacts(newContacts, sortOrder)
+    })
+  }
+
+  const sortContacts = (contactsArray, order) => {
+    return [...contactsArray].sort((a, b) => {
+      const dateA = new Date(a.createdAt)
+      const dateB = new Date(b.createdAt)
+      return order === 'asc' ? dateA - dateB : dateB - dateA
+    })
+  }
+
+  const handleSortUpdate = (sortOption) => {
+    setSortOrder(sortOption)
+    setContacts((prevContacts) => sortContacts(prevContacts, sortOption))
   }
 
   if (loading)
@@ -112,7 +129,7 @@ export default function ContactsPage() {
             {sortOptions.map((option) => (
               <DropdownMenuItem
                 key={option.value}
-                onClick={() => setSortOrder(option.value)}
+                onClick={() => handleSortUpdate(option.value)}
               >
                 {option.label}
               </DropdownMenuItem>
@@ -129,8 +146,6 @@ export default function ContactsPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className='max-w-[300px]'
         />
-        {/* Existing Sort Dropdown */}
-        <DropdownMenu>{/* ... existing dropdown code ... */}</DropdownMenu>
       </div>
 
       <ScrollArea className='h-[calc(100vh-200px)]'>
@@ -142,47 +157,41 @@ export default function ContactsPage() {
                 : `No matches for "${searchTerm}"`}
             </p>
           ) : (
-            [...filteredContacts]
-              .sort((a, b) => {
-                const dateA = new Date(a.createdAt)
-                const dateB = new Date(b.createdAt)
-                return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
-              })
-              .map((contact) => (
-                <Card
-                  key={contact.id}
-                  className='cursor-pointer transition-colors hover:bg-accent/50'
-                  onClick={() =>
-                    navigate(`/contacts/${contact.id}`, {
-                      state: { contact }, // Pass contact data via state
-                    })
-                  }
-                >
-                  <CardHeader>
-                    <h3 className='text-lg font-semibold'>{contact.name}</h3>
-                  </CardHeader>
-                  <CardContent className='space-y-2'>
-                    {contact.email && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Mail className='h-4 w-4' />
-                        <span>{contact.email}</span>
-                      </div>
-                    )}
-                    {contact.phone && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Phone className='h-4 w-4' />
-                        <span>{contact.phone}</span>
-                      </div>
-                    )}
-                    {contact.notes && (
-                      <div className='flex items-center gap-2 text-sm'>
-                        <Notebook className='h-4 w-4' />
-                        <span className='line-clamp-2'>{contact.notes}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
+            [...filteredContacts].map((contact) => (
+              <Card
+                key={contact.id}
+                className='cursor-pointer transition-colors hover:bg-accent/50'
+                onClick={() =>
+                  navigate(`/contacts/${contact.id}`, {
+                    state: { contact }, // Pass contact data via state
+                  })
+                }
+              >
+                <CardHeader>
+                  <h3 className='text-lg font-semibold'>{contact.name}</h3>
+                </CardHeader>
+                <CardContent className='space-y-2'>
+                  {contact.email && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Mail className='h-4 w-4' />
+                      <span>{contact.email}</span>
+                    </div>
+                  )}
+                  {contact.phone && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Phone className='h-4 w-4' />
+                      <span>{contact.phone}</span>
+                    </div>
+                  )}
+                  {contact.notes && (
+                    <div className='flex items-center gap-2 text-sm'>
+                      <Notebook className='h-4 w-4' />
+                      <span className='line-clamp-2'>{contact.notes}</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
           )}
         </div>
       </ScrollArea>
