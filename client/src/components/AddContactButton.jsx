@@ -80,8 +80,8 @@ export default function AddContactButton({ onContactAdded }) {
             <Input id='name' name='name' required />
           </div>
           <div>
-            <Label htmlFor='email'>Email</Label>
-            <Input id='email' name='email' type='email' />
+            <Label htmlFor='email'>Email *</Label>
+            <Input id='email' name='email' type='email' required />
           </div>
           <div>
             <Label htmlFor='phone'>Phone</Label>
